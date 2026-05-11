@@ -596,16 +596,35 @@ void uii_getinterfacecount(void)
 void uii_getipaddress(void)
 {
 	unsigned char tempTarget = uii_target;
-	unsigned char cmd[] = {0x00,NET_CMD_GET_IP_ADDRESS, 0x00}; // interface 0 (theres only one)
-	
-	uii_settarget(TARGET_NETWORK);
-	uii_sendcommand(cmd, 0x03);
+	unsigned char interface_id = 0;
+	unsigned char interface_count = 0;
+	unsigned char cmd[] = {0x00,NET_CMD_GET_IP_ADDRESS, 0x00};
 
-	uii_readdata();
-	uii_readstatus();
-	uii_accept();
-	
-	uii_target = tempTarget;
+	uii_getinterfacecount();
+
+	if(!uii_success())
+		return;
+
+	interface_count = uii_data[0];
+
+	// Ethernet and Wi-Fi are separate interfaces. Use the first
+	// reported interface that has a configured IP address.
+	for(interface_id = 0; interface_id < interface_count; ++interface_id)
+	{
+		cmd[2] = interface_id;
+
+		uii_settarget(TARGET_NETWORK);
+		uii_sendcommand(cmd, 0x03);
+
+		uii_readdata();
+		uii_readstatus();
+		uii_accept();
+
+		uii_target = tempTarget;
+
+		if(uii_data[0] != 0 || uii_data[1] != 0 || uii_data[2] != 0 || uii_data[3] != 0)
+			return;
+	}
 }
 
 unsigned char uii_connect(char* host, unsigned short port, char cmd)
