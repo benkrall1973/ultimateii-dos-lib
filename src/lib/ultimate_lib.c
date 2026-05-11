@@ -622,7 +622,7 @@ void uii_getipaddress(void)
 
 		uii_target = tempTarget;
 
-		if(uii_data[0] != 0 || uii_data[1] != 0 || uii_data[2] != 0 || uii_data[3] != 0)
+		if(uii_data[0] != 0)
 			return;
 	}
 }

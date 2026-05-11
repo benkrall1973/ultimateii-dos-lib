@@ -484,7 +484,7 @@ unsigned char getconfig(void)
 	printf("\n\nNetwork Interface Status : %s", uii_status);
 
 	uii_getipaddress();
-	has_ipaddress = uii_data[0] != 0 || uii_data[1] != 0 || uii_data[2] != 0 || uii_data[3] != 0;
+	has_ipaddress = uii_data[0] != 0;
 	printf("\n\nIP Address: %d.%d.%d.%d", uii_data[0], uii_data[1], uii_data[2], uii_data[3]);
 	printf("\n   Netmask: %d.%d.%d.%d", uii_data[4], uii_data[5], uii_data[6], uii_data[7]);
 	printf("\n   Gateway: %d.%d.%d.%d", uii_data[8], uii_data[9], uii_data[10], uii_data[11]);
