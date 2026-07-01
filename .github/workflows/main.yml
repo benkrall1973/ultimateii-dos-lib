@@ -1,0 +1,40 @@
+name: Build C64 D64 Image
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Download the repository files to the GitHub runner
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. Install cc65 compiler and VICE tools (which includes c1541)
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cc65 vice
+
+    # 3. Compile your C/Assembly files into a Commodore .PRG executable
+    - name: Compile C64 Program
+      run: |
+        cl65 -O -t c64 main.c -o main.prg
+
+    # 4. Use the c1541 utility to create a blank D64 and write the PRG to it
+    - name: Create D64 Disk Image
+      run: |
+        c1541 -format "myprogram,id" d64 myproject.d64
+        c1541 -attach myproject.d64 -write main.prg "myprogram"
+
+    # 5. Upload the final .D64 file so you can download it from GitHub
+    - name: Upload D64 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: c64-disk-image
+        path: myproject.d64
